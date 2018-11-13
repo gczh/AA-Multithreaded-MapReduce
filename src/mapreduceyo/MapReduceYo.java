@@ -38,6 +38,11 @@ public class MapReduceYo {
         
         // Loop through each file in /inputs directory (warning: the files are LARGE at ~190mb each)
         File inputsFolder = new File(folderLocation);
+        // start timer
+        System.out.println("Starting timer...");
+        StopWatch timer = new StopWatch();
+        timer.start();
+        // Loop through directory
         for(File file : inputsFolder.listFiles()) {
             if(file.isFile()) {
                 // Try to take a file location, read the contents and aggregate the name value pairs
@@ -72,6 +77,9 @@ public class MapReduceYo {
         for(String name : nameTotals.keySet()) {
             System.out.println(name + ": " + nameTotals.get(name));
         }
+        
+        System.out.println("Time elapsed : " + timer.toString());
+        System.out.println("Summary:");
         
     }
     
