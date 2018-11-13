@@ -10,19 +10,43 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Random;
 import java.io.*;
+import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  *
  * @author cuppycakes
  */
+
+class NameValue {
+    private String name;
+    private int value; 
+    
+    public NameValue(String name, int value) {
+        this.name = name;
+        this.value = value;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getValue() {
+        return value;
+    }
+    
+    
+}
+
 public class InputGenerator {
     
-    private static final String FILENAME = "./input.txt";
+    private static final int TARGET = 10_000_000;
+    private static final String FILENAME = "./input_"+TARGET+".txt";
     
     public static void main(String[] args) {
         
         // Delete file if it already exists for a fresh input file
-        File file = new File("./input.txt"); 
+        File file = new File(FILENAME); 
           
         if(file.delete()) 
         { 
@@ -31,7 +55,9 @@ public class InputGenerator {
         
         // For generating a list of names and numbers for MapReduce multithreading example
         
-        String[] names = { "Gabriel", "Mokkie", "Ouh Eng Lieh", "Aldric", "Potato", "Dion", "Moses", "Randall", "Jordy", "David" };
+        String[] names = { "Gabriel", "Sunshine", "Mokkie", "Ouh Eng Lieh", "Aldric", "Potato", "Dion", "Moses", "Randall", "Jordy", "David" };
+        ArrayList<NameValue> nameValueList = new ArrayList<>();
+        
         Random rand = new Random();
         BufferedWriter bw = null;
         FileWriter fw = null;
@@ -40,39 +66,43 @@ public class InputGenerator {
             System.out.println(name + "\n===============");
             
             int count = 0;
-            int target = 100;
             do {
                 int randomNumber = rand.nextInt(10) + 1;
-                if ((target - (count + randomNumber)) < 0) {
-                    randomNumber = target - count;
+                if ((TARGET - (count + randomNumber)) < 0) {
+                    randomNumber = TARGET - count;
                 }
-                try {
-                    fw = new FileWriter(FILENAME, true);
-                    bw = new BufferedWriter(fw);
-                    bw.write(name + "," + randomNumber + "\n");
-                } catch(IOException ioe) {
-                    ioe.printStackTrace();
-                } finally {
-                    try {
-                        if (bw != null)
-                            bw.close();
-
-                        if (fw != null)
-                            fw.close();
-
-                    } catch (IOException ex) {
-                        ex.printStackTrace();
-                    }
-                }
+                nameValueList.add(new NameValue(name, randomNumber));
                 
                 count += randomNumber;
-            } while(count != target);
-            
-            // Scramble the lines now
-            
-            
+            } while(count != TARGET);
             
         }
         
+        // Scramble the lines now
+        Collections.shuffle(nameValueList);
+        
+        try {
+            fw = new FileWriter(FILENAME, true);
+            bw = new BufferedWriter(fw);
+
+            // Iterate over shuffled arraylist of non-unique name value pairs
+            for(NameValue nv : nameValueList) {
+                bw.write(nv.getName() + "," + nv.getValue() + "\n");
+            }
+
+        } catch(IOException ioe) {
+            ioe.printStackTrace();
+        } finally {
+            try {
+                if (bw != null)
+                    bw.close();
+
+                if (fw != null)
+                    fw.close();
+
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
     }
 }
