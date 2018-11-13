@@ -44,11 +44,9 @@ public class MapReduceYo {
             }
         
         } catch(FileNotFoundException fnfe) {
-            System.out.println("Issues with accessing the file");
-            fnfe.printStackTrace();
+            System.out.println("Can't find the file");
         } catch(IOException ioe) {
             System.out.println("Issues with reading the file");
-            ioe.printStackTrace();
         }
     }
     
