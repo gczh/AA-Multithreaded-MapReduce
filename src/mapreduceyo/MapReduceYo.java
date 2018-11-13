@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Scanner;
 
 /**
@@ -29,25 +30,49 @@ public class MapReduceYo {
         Scanner scanner = new Scanner(System.in);
         
         // get file location as String
-        System.out.print("Where's the file you want us to MapReduce? ");
-        String fileLocation = scanner.next();
+        System.out.print("Where's the folder you want us to MapReduce? ");
+        String folderLocation = scanner.next();
         
-        try {
-            
-            File file = new File(fileLocation); 
+        // HashMap to do aggregation
+        HashMap<String, Integer> nameTotals = new HashMap<>();
+        
+        // Loop through each file in /inputs directory (warning: the files are LARGE at ~190mb each)
+        File inputsFolder = new File(folderLocation);
+        for(File file : inputsFolder.listFiles()) {
+            if(file.isFile()) {
+                // Try to take a file location, read the contents and aggregate the name value pairs
+                try {
 
-            BufferedReader br = new BufferedReader(new FileReader(file)); 
+                    // File file = new File(fileLocation); 
 
-            String st; 
-            while ((st = br.readLine()) != null) {
-              System.out.println(st); 
+                    BufferedReader br = new BufferedReader(new FileReader(file)); 
+
+                    String line; 
+                    while ((line = br.readLine()) != null) {
+                      String[] tokens = line.split(",");
+                      String name = tokens[0];
+                      int value = Integer.parseInt(tokens[1]);
+
+                      if(!nameTotals.containsKey(name)) {
+                          nameTotals.put(name, 0);
+                      }
+
+                      int currValue = nameTotals.get(name);
+                      nameTotals.put(name, currValue + value);
+                    }
+
+                } catch(FileNotFoundException fnfe) {
+                    System.out.println("Can't find the file");
+                } catch(IOException ioe) {
+                    System.out.println("Issues with reading the file");
+                }
             }
-        
-        } catch(FileNotFoundException fnfe) {
-            System.out.println("Can't find the file");
-        } catch(IOException ioe) {
-            System.out.println("Issues with reading the file");
         }
+        
+        for(String name : nameTotals.keySet()) {
+            System.out.println(name + ": " + nameTotals.get(name));
+        }
+        
     }
     
 }

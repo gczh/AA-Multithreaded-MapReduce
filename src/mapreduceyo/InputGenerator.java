@@ -20,9 +20,9 @@ import java.util.Collections;
 
 class NameValue {
     private String name;
-    private int value; 
+    private long value; 
     
-    public NameValue(String name, int value) {
+    public NameValue(String name, long value) {
         this.name = name;
         this.value = value;
     }
@@ -31,7 +31,7 @@ class NameValue {
         return name;
     }
 
-    public int getValue() {
+    public long getValue() {
         return value;
     }
     
@@ -40,69 +40,77 @@ class NameValue {
 
 public class InputGenerator {
     
-    private static final int TARGET = 10_000_000;
-    private static final String FILENAME = "./input_"+TARGET+".txt";
+    private static final long TARGET = 10_000_000;
+    private static final String FOLDER = "./inputs";
+//    private static final String FILENAME = "./" + FOLDER + "/input_"+TARGET+".txt";
     
     public static void main(String[] args) {
         
-        // Delete file if it already exists for a fresh input file
-        File file = new File(FILENAME); 
-          
-        if(file.delete()) 
-        { 
-            System.out.println("File deleted successfully"); 
-        }
+        // Generate 10 summing up to total of TARGET * 10 when performing MapReduce
+        // Takes approximate 1m26s
+        for(int fileNum = 1; fileNum <= 10; fileNum++) {
+            String FILENAME = "./" + FOLDER + "/input_" + TARGET + "_" + fileNum + ".txt";
         
-        // For generating a list of names and numbers for MapReduce multithreading example
-        
-        String[] names = { "Gabriel", "Sunshine", "Mokkie", "Ouh Eng Lieh", "Aldric", "Potato", "Dion", "Moses", "Randall", "Jordy", "David" };
-        ArrayList<NameValue> nameValueList = new ArrayList<>();
-        
-        Random rand = new Random();
-        BufferedWriter bw = null;
-        FileWriter fw = null;
-        
-        for(String name : names) {
-            System.out.println(name + "\n===============");
-            
-            int count = 0;
-            do {
-                int randomNumber = rand.nextInt(10) + 1;
-                if ((TARGET - (count + randomNumber)) < 0) {
-                    randomNumber = TARGET - count;
-                }
-                nameValueList.add(new NameValue(name, randomNumber));
-                
-                count += randomNumber;
-            } while(count != TARGET);
-            
-        }
-        
-        // Scramble the lines now
-        Collections.shuffle(nameValueList);
-        
-        try {
-            fw = new FileWriter(FILENAME, true);
-            bw = new BufferedWriter(fw);
+            // Delete file if it already exists for a fresh input file
+            File file = new File(FILENAME); 
 
-            // Iterate over shuffled arraylist of non-unique name value pairs
-            for(NameValue nv : nameValueList) {
-                bw.write(nv.getName() + "," + nv.getValue() + "\n");
+            if(file.delete()) 
+            { 
+                System.out.println("File deleted successfully"); 
             }
 
-        } catch(IOException ioe) {
-            ioe.printStackTrace();
-        } finally {
+            // For generating a list of names and numbers for MapReduce multithreading example
+
+            String[] names = { "Gabriel", "Sunshine", "Mokkie", "Ouh Eng Lieh", "Aldric", "Potato", "Dion", "Moses", "Randall", "Jordy", "David" };
+            ArrayList<NameValue> nameValueList = new ArrayList<>();
+
+            Random rand = new Random();
+            BufferedWriter bw = null;
+            FileWriter fw = null;
+
+            for(String name : names) {
+                System.out.println(name + "\n===============");
+
+                long count = 0;
+                do {
+                    long randomNumber = rand.nextInt(10) + 1;
+                    if ((TARGET - (count + randomNumber)) < 0) {
+                        randomNumber = TARGET - count;
+                    }
+                    nameValueList.add(new NameValue(name, randomNumber));
+
+                    count += randomNumber;
+                } while(count != TARGET);
+
+            }
+
+            // Scramble the lines now
+            Collections.shuffle(nameValueList);
+
             try {
-                if (bw != null)
-                    bw.close();
+                fw = new FileWriter(FILENAME, true);
+                bw = new BufferedWriter(fw);
 
-                if (fw != null)
-                    fw.close();
+                // Iterate over shuffled arraylist of non-unique name value pairs
+                for(NameValue nv : nameValueList) {
+                    bw.write(nv.getName() + "," + nv.getValue() + "\n");
+                }
 
-            } catch (IOException ex) {
-                ex.printStackTrace();
+            } catch(IOException ioe) {
+                ioe.printStackTrace();
+            } finally {
+                try {
+                    if (bw != null)
+                        bw.close();
+
+                    if (fw != null)
+                        fw.close();
+
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
             }
         }
+        
     }
 }
