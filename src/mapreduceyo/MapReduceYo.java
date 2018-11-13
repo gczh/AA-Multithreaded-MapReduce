@@ -34,7 +34,7 @@ public class MapReduceYo {
         String folderLocation = scanner.next();
         
         // HashMap to do aggregation
-        HashMap<String, Integer> nameTotals = new HashMap<>();
+        HashMap<String, Long> nameTotals = new HashMap<>();
         
         // Loop through each file in /inputs directory (warning: the files are LARGE at ~190mb each)
         File inputsFolder = new File(folderLocation);
@@ -54,10 +54,10 @@ public class MapReduceYo {
                       int value = Integer.parseInt(tokens[1]);
 
                       if(!nameTotals.containsKey(name)) {
-                          nameTotals.put(name, 0);
+                          nameTotals.put(name, 0L);
                       }
 
-                      int currValue = nameTotals.get(name);
+                      long currValue = nameTotals.get(name);
                       nameTotals.put(name, currValue + value);
                     }
 
