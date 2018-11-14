@@ -79,6 +79,8 @@ public class MokReduceGood {
             We want to concurrently work on reducing every finished Map task
         */
         
+        // Store all reducers in the same way we did for mappers
+        HashMap<Future<HashMap<String, Long>>, Boolean> reducers = new HashMap<>();
         
         boolean allDone = false;
         do {
@@ -95,14 +97,9 @@ public class MokReduceGood {
                             HashMap<String, Long> result = future.get();
                             System.out.println("Size of result: " + result.size());
                             // Merge result with nameTotals (replace with reducer later)
-                            for(String name : result.keySet()) {
-                                Long value = result.get(name);
-                                if(!nameTotals.containsKey(name)) {
-                                    nameTotals.put(name, 0L);
-                                }
-                                Long currValue = nameTotals.get(name);
-                                nameTotals.put(name, currValue + value);
-                            }
+                            Future<HashMap<String, Long>> reducer = pool.submit(new Reducer(nameTotals, result));
+                            reducers.put(reducer, false);
+                            
                         } catch (InterruptedException ie) {
                             System.out.println("Interrupted Execution");
                         } catch (ExecutionException ee) {
@@ -116,9 +113,34 @@ public class MokReduceGood {
             }
         } while (!allDone);
        
+        boolean allReducersDone = false;
+        do {
+            for(Future<HashMap<String, Long>> future : reducers.keySet()) {
+                // If ALL futures are done, this will be true 
+                if(!future.isDone()) {
+                    allDone = false;
+                } else {
+                    if(!reducers.get(future)) {
+                        try {
+                            // Mutate nameTotals with the new reduced/combined one
+                            nameTotals = future.get();
+                        } catch (InterruptedException ie) {
+                            System.out.println("Interrupted Exception in Reducers");
+                        } catch (ExecutionException ee) {
+                            System.out.println("Execution Exception in Reducers");
+                        }
+                    }
+                    
+                    reducers.put(future, true);
+                    allReducersDone = true;
+                }
+            }
+        } while(!allReducersDone);
         
-        for(String name : nameTotals.keySet()) {
-            System.out.println(name + ": " + nameTotals.get(name));
+        if(allReducersDone) {
+            for (String name : nameTotals.keySet()) {
+                System.out.println(name + ": " + nameTotals.get(name));
+            }
         }
         
         System.out.println("Time elapsed : " + timer.toString());

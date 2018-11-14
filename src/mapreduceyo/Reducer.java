@@ -13,10 +13,11 @@ public class Reducer implements Callable<HashMap<String, Long>> {
     
     /*
         Passes in the main name totals variable from the Main program
-        The reducers then calculates the total and mutates that
+        and the mapper's name subtotals as well.
+        The reducers then calculates the total from both and returns the total
     */
-    public Reducer(HashMap<String, Long> masterNameTotals) {
-        this.nameTotals = new HashMap<>();
+    public Reducer(HashMap<String, Long> masterNameTotals, HashMap<String, Long> nameSubTotals) {
+        this.nameTotals = nameSubTotals;
         this.masterNameTotals = masterNameTotals;
     }
     
