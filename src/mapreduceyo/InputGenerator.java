@@ -41,7 +41,7 @@ class NameValue {
 public class InputGenerator {
     
     private static final long TARGET = 10_000_000;
-    private static final String FOLDER = "../inputs";
+    private static final String FOLDER = "./inputs";
 //    private static final String FILENAME = "./" + FOLDER + "/input_"+TARGET+".txt";
     
     public static void main(String[] args) {
