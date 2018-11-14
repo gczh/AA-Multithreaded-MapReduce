@@ -10,8 +10,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
+import java.util.concurrent.*;
 
 /**
  *
@@ -38,41 +40,78 @@ public class MapReduceYo {
         
         // Loop through each file in /inputs directory (warning: the files are LARGE at ~190mb each)
         File inputsFolder = new File(folderLocation);
+        
         // start timer
         System.out.println("Starting timer...");
         StopWatch timer = new StopWatch();
         timer.start();
+        
+        
+        // Create Thread Pool to multithread MapReduce tasks
+        ExecutorService pool = Executors.newCachedThreadPool();
+        /* 
+            Each future is mapped to false
+            False refers to future not being completed: !isDone()
+        */
+        HashMap<Future<HashMap<String, Long>>, Boolean> mappers = new HashMap<>();
+        
+        
         // Loop through directory
+        /*
+            Assume that we are working with a super large dataset that's being streamed from different
+            locations into the server. And our job is to aggregate the name value pairs into 
+            name total pairs
+        */
+        
         for(File file : inputsFolder.listFiles()) {
             if(file.isFile()) {
+                System.out.println("Adding " + file.getName());
                 // Try to take a file location, read the contents and aggregate the name value pairs
-                try {
-
-                    // File file = new File(fileLocation); 
-
-                    BufferedReader br = new BufferedReader(new FileReader(file)); 
-
-                    String line; 
-                    while ((line = br.readLine()) != null) {
-                      String[] tokens = line.split(",");
-                      String name = tokens[0];
-                      int value = Integer.parseInt(tokens[1]);
-
-                      if(!nameTotals.containsKey(name)) {
-                          nameTotals.put(name, 0L);
-                      }
-
-                      long currValue = nameTotals.get(name);
-                      nameTotals.put(name, currValue + value);
-                    }
-
-                } catch(FileNotFoundException fnfe) {
-                    System.out.println("Can't find the file");
-                } catch(IOException ioe) {
-                    System.out.println("Issues with reading the file");
-                }
+                Mapper mapper = new Mapper(file);
+                Future<HashMap<String, Long>> future = pool.submit(mapper);
+                mappers.put(future, false);
             }
         }
+        
+        
+        /*
+            Instead of perpetually waiting for every Map task to be done
+            We want to concurrently work on reducing every finished Map task
+        */
+        
+        
+        boolean allDone = false;
+        do {
+            for(Future<HashMap<String, Long>> future : mappers.keySet()) {
+                if(future.isDone()) {
+                    System.out.println("Done with a file!");
+                    
+                    try {
+                        HashMap<String, Long> result = future.get();
+                        System.out.println("Size of result: " + result.size());
+                        // Merge result with nameTotals (replace with reducer later)
+                        for(String name : result.keySet()) {
+                            Long value = result.get(name);
+                            if(!nameTotals.containsKey(name)) {
+                                nameTotals.put(name, 0L);
+                            }
+                            Long currValue = nameTotals.get(name);
+                            nameTotals.put(name, currValue + value);
+                        }
+                    } catch (InterruptedException ie) {
+                        System.out.println("Interrupted Execution");
+                    } catch (ExecutionException ee) {
+                        System.out.println("Execution Exception");
+                    }
+                }
+                // If ALL futures are done, this will be true 
+                if(!future.isDone()) 
+                    allDone = false;
+                else
+                    allDone = true;
+            }
+        } while (!allDone);
+       
         
         for(String name : nameTotals.keySet()) {
             System.out.println(name + ": " + nameTotals.get(name));

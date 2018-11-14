@@ -10,11 +10,21 @@ import java.util.*;
 /**
  *
  * @author cuppycakes
+ * 
+ * This class should take in a file full of Name Value pairs
+ * It will map to a HashMap of Name and Totals for that ONE file
+ * Then it reduces it further to Name and Totals for ALL files
+ * 
  */
 public class MapReduce {
     
-    public Map<String, Integer> map(String key, int value) {
-        Map<String, Integer> keyValues = new HashMap<String, Integer>();
-        return keyValues;
+    private HashMap<String, Long> valueTotals = new HashMap<>();
+    
+    public Map<String, Long> map(String key, long value) {
+        
+    }
+    
+    public Map<String, Long> reduce(String key, long value) {
+        
     }
 }
