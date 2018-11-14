@@ -41,7 +41,7 @@ class NameValue {
 public class InputGenerator {
     
     private static final long TARGET = 10_000_000;
-    private static final String FOLDER = "./inputs";
+    private static final String FOLDER = "../inputs";
 //    private static final String FILENAME = "./" + FOLDER + "/input_"+TARGET+".txt";
     
     public static void main(String[] args) {
@@ -49,7 +49,7 @@ public class InputGenerator {
         // Generate 10 summing up to total of TARGET * 10 when performing MapReduce
         // Takes approximate 1m26s
         for(int fileNum = 1; fileNum <= 10; fileNum++) {
-            String FILENAME = "./" + FOLDER + "/input_" + TARGET + "_" + fileNum + ".txt";
+            String FILENAME = FOLDER + "/input_" + TARGET + "_" + fileNum + ".txt";
         
             // Delete file if it already exists for a fresh input file
             File file = new File(FILENAME); 
