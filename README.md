@@ -34,7 +34,7 @@ I found it significantly easier to understand functional programming examples wr
 
 1. At least 1.82 GB of space on your computer
 
-    This is because the `generate.bat` file creates 10 datasets each sized at 182 MB. There will 10 of the same files, thus adding up to 1.82 GB of space for the test dataset. We recommend using a large dataset to really see the performance improvements of ~60% in execution time, which is measured using `Stopwatch.java`.
+    This is because the `generate.bat` file creates 10 datasets each sized at 182 MB. There will 10 of the same files, thus adding up to 1.82 GB of space for the test dataset. We recommend using a large dataset to really see the performance improvements of ~60% in execution time for MapReduce implementation, which is measured using `Stopwatch.java`.
 
 2. Java 8 and above
 
