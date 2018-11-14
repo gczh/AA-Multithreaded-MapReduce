@@ -1,4 +1,4 @@
-# AA-Multithreaded-MapReduce
+# Mok Reduce - Mokspired Map Reduce
 Multithreading MapReduce for Architectural Analysis Mod
 
 # Background / Brief Description Of Project
