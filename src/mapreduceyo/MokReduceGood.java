@@ -19,14 +19,14 @@ import java.util.concurrent.*;
  *
  * @author cuppycakes
  */
-public class MapReduceYo {
+public class MokReduceGood {
 
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
         // TODO code application logic here
-        System.out.println("Welcome to MapReduce App");
+        System.out.println("Welcome to MokReduce App");
         
         // Create scanner for CLI app
         Scanner scanner = new Scanner(System.in);
@@ -83,31 +83,33 @@ public class MapReduceYo {
         boolean allDone = false;
         do {
             for(Future<HashMap<String, Long>> future : mappers.keySet()) {
-                if(future.isDone() && !mappers.get(future)) {
-                    System.out.println("Done with a file!");
-                    
-                    try {
-                        HashMap<String, Long> result = future.get();
-                        System.out.println("Size of result: " + result.size());
-                        // Merge result with nameTotals (replace with reducer later)
-                        for(String name : result.keySet()) {
-                            Long value = result.get(name);
-                            if(!nameTotals.containsKey(name)) {
-                                nameTotals.put(name, 0L);
-                            }
-                            Long currValue = nameTotals.get(name);
-                            nameTotals.put(name, currValue + value);
-                        }
-                    } catch (InterruptedException ie) {
-                        System.out.println("Interrupted Execution");
-                    } catch (ExecutionException ee) {
-                        System.out.println("Execution Exception");
-                    }
-                }
                 // If ALL futures are done, this will be true 
                 if(!future.isDone()) 
                     allDone = false;
                 else {
+                    // if not reduced
+                    if(!mappers.get(future)) {
+                        System.out.println("Done with a file!");
+                    
+                        try {
+                            HashMap<String, Long> result = future.get();
+                            System.out.println("Size of result: " + result.size());
+                            // Merge result with nameTotals (replace with reducer later)
+                            for(String name : result.keySet()) {
+                                Long value = result.get(name);
+                                if(!nameTotals.containsKey(name)) {
+                                    nameTotals.put(name, 0L);
+                                }
+                                Long currValue = nameTotals.get(name);
+                                nameTotals.put(name, currValue + value);
+                            }
+                        } catch (InterruptedException ie) {
+                            System.out.println("Interrupted Execution");
+                        } catch (ExecutionException ee) {
+                            System.out.println("Execution Exception");
+                        }
+                    }
+                    
                     mappers.put(future, true);
                     allDone = true;
                 }
