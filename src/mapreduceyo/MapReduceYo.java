@@ -83,7 +83,7 @@ public class MapReduceYo {
         boolean allDone = false;
         do {
             for(Future<HashMap<String, Long>> future : mappers.keySet()) {
-                if(future.isDone()) {
+                if(future.isDone() && !mappers.get(future)) {
                     System.out.println("Done with a file!");
                     
                     try {
@@ -107,8 +107,10 @@ public class MapReduceYo {
                 // If ALL futures are done, this will be true 
                 if(!future.isDone()) 
                     allDone = false;
-                else
+                else {
+                    mappers.put(future, true);
                     allDone = true;
+                }
             }
         } while (!allDone);
        
